@@ -101,7 +101,7 @@ w_vals = w_conf(a_vals)
 H_ratio = H_with_conf(a_vals) / H_LCDM(a_vals)
 
 # ---------------------------------------------------------
-# Figure 1 — Three-panel composite (PRD style)
+# Figure 1 - Three-panel composite (PRD style)
 # ---------------------------------------------------------
 plt.rcParams.update({
     "font.size": 11,
