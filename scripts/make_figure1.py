@@ -92,6 +92,40 @@ print()
 print(f"Confinement fraction at recombination: {frac_rec:.3f}")
 
 # ---------------------------------------------------------
+# Aggressive (non-Planck-safe) configuration: same shape,
+# rho0_conf solved numerically to reproduce -6.5% for the
+# paper's "proof of principle" claim
+# ---------------------------------------------------------
+from scipy.optimize import brentq
+
+def delta_rs_for_rho0(rho0):
+    def H_scaled(a):
+        frac = rho_conf_frac(a) * (rho0 / rho0_conf)
+        return H_LCDM(a) * np.sqrt(1.0 + frac)
+    rs_c = sound_horizon(H_scaled, a_max=a_rec)
+    return (rs_c - rs_LCDM) / rs_LCDM * 100.0
+
+rho0_aggressive = brentq(lambda r: delta_rs_for_rho0(r) - (-6.5), 0.01, 0.999)
+print()
+print("=== Aggressive (non-Planck-safe) configuration ===")
+print(f"rho0_conf solved for Delta r_s/r_s = -6.5%: {rho0_aggressive:.3f}")
+print(f"(vs. Planck bound rho0 <~ 0.1 -- this is ~{rho0_aggressive/0.1:.1f}x over budget)")
+
+# ---------------------------------------------------------
+# Causality check: w_conf(a) against the causal bound w<=1
+# ---------------------------------------------------------
+w_rec = w_conf(np.array([a_rec]))[0]
+a_scan = np.logspace(-6, -2, 200000)
+w_scan = w_conf(a_scan)
+w_peak = np.nanmax(w_scan)
+a_at_w_peak = a_scan[np.nanargmax(w_scan)]
+print()
+print("=== Causality check (w_conf vs. causal bound w<=1) ===")
+print(f"w_conf at recombination (a={a_rec:.0e}): {w_rec:.2f}")
+print(f"w_conf peak: {w_peak:.2f} at a={a_at_w_peak:.4e}")
+print("Both exceed the causal bound w<=1 -- see main.tex Discussion/Causality Constraint.")
+
+# ---------------------------------------------------------
 # Prepare grids for plotting
 # ---------------------------------------------------------
 a_vals = np.logspace(-5, -2, 2000)
